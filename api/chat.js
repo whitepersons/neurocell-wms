@@ -1,10 +1,48 @@
 // api/chat.js
 import https from 'node:https';
 
-// Игнорируем проверку сертификата Минцифры Сбера
-const agent = new https.Agent({
-    rejectUnauthorized: false
-});
+// Универсальный хелпер для безопасных HTTPS-запросов к серверам Сбера без блокировки по CA Минцифры
+function makeHttpsRequest(url, options, data = null) {
+    return new Promise((resolve, reject) => {
+        const parsedUrl = new URL(url);
+        const reqOptions = {
+            hostname: parsedUrl.hostname,
+            port: parsedUrl.port || 443,
+            path: parsedUrl.pathname + parsedUrl.search,
+            method: options.method || 'GET',
+            headers: options.headers || {},
+            rejectUnauthorized: false // КРИТИЧНО: игнорируем ошибку самоподписанного сертификата Минцифры
+        };
+
+        const req = https.request(reqOptions, (res) => {
+            let body = '';
+            res.on('data', (chunk) => body += chunk);
+            res.on('end', () => {
+                try {
+                    const parsed = JSON.parse(body);
+                    if (res.statusCode >= 200 && res.statusCode < 300) {
+                        resolve(parsed);
+                    } else {
+                        reject(new Error(`HTTP ${res.statusCode}: ${JSON.stringify(parsed)}`));
+                    }
+                } catch (e) {
+                    if (res.statusCode >= 200 && res.statusCode < 300) {
+                        resolve(body);
+                    } else {
+                        reject(new Error(`HTTP ${res.statusCode}: ${body}`));
+                    }
+                }
+            });
+        });
+
+        req.on('error', (err) => reject(err));
+
+        if (data) {
+            req.write(data);
+        }
+        req.end();
+    });
+}
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
@@ -25,61 +63,58 @@ export default async function handler(req, res) {
             return res.status(500).json({ error: 'В Vercel не задана переменная GIGACHAT_CREDENTIALS' });
         }
 
-        // ШАГ 1: Авторизация OAuth2
+        // =========================================================
+        // ШАГ 1: Авторизация OAuth2 в Сбере
+        // =========================================================
         const rqUid = crypto.randomUUID();
-        const tokenRes = await fetch('https://ngw.devices.sberbank.ru:9443/api/v2/oauth', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'Accept': 'application/json',
-                'RqUID': rqUid,
-                'Authorization': `Basic ${credentials.trim()}`
+        const tokenData = await makeHttpsRequest(
+            'https://ngw.devices.sberbank.ru:9443/api/v2/oauth',
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Accept': 'application/json',
+                    'RqUID': rqUid,
+                    'Authorization': `Basic ${credentials.trim()}`
+                }
             },
-            body: `scope=${encodeURIComponent(scope)}`,
-            agent: agent
-        });
+            `scope=${encodeURIComponent(scope)}`
+        );
 
-        if (!tokenRes.ok) {
-            const err = await tokenRes.text();
-            throw new Error(`Ошибка авторизации Сбера (${tokenRes.status}): ${err}`);
-        }
-
-        const tokenData = await tokenRes.json();
         const accessToken = tokenData.access_token;
 
-        // ШАГ 2: Запрос к GigaChat с контекстом NeuroCell WMS
+        // =========================================================
+        // ШАГ 2: Запрос к модели GigaChat
+        // =========================================================
         const systemPrompt = `Ты — оперативный ИИ-диспетчер системы «NeuroCell WMS» (узел NODE-NSK-NC01, Новосибирск).
 Контекст: Складской распределительный центр, интеграционный шлюз 1С:WMS, машинное зрение C++/PyTorch.
 Текущий инцидент: на камере CAM-03 зафиксирована ошибка адресации — паллета #PL-8492 поставлена в ячейку В-04 вместо ячейки В-06.
 Твоя роль: профессионально, емко и строго по делу консультировать оператора, выдавая пошаговые регламенты разрешения коллизий и данные по WMS.`;
 
-        const chatRes = await fetch('https://gigachat.devices.sberbank.ru/api/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'Authorization': `Bearer ${accessToken}`
-            },
-            body: JSON.stringify({
-                model: 'GigaChat',
-                messages: [
-                    { role: 'system', content: systemPrompt },
-                    { role: 'user', content: message }
-                ],
-                temperature: 0.3,
-                max_tokens: 1024
-            }),
-            agent: agent
+        const chatPayload = JSON.stringify({
+            model: 'GigaChat',
+            messages: [
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: message }
+            ],
+            temperature: 0.3,
+            max_tokens: 1024
         });
 
-        if (!chatRes.ok) {
-            const chatErr = await chatRes.text();
-            throw new Error(`Ошибка генерации GigaChat (${chatRes.status}): ${chatErr}`);
-        }
+        const chatData = await makeHttpsRequest(
+            'https://gigachat.devices.sberbank.ru/api/v1/chat/completions',
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`
+                }
+            },
+            chatPayload
+        );
 
-        const chatData = await chatRes.json();
         const replyText = chatData.choices[0].message.content;
-
         return res.status(200).json({ reply: replyText });
 
     } catch (err) {
