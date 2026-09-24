@@ -92,3 +92,23 @@ window.handleEnter = function(event) {
 };
 
 document.addEventListener('DOMContentLoaded', initSystem);
+
+function renderMessage(text, isUser = false) {
+    if (!ui.chatWindow) return;
+    
+    const msgDiv = document.createElement('div');
+    msgDiv.className = `msg ${isUser ? 'msg-op' : 'msg-sys'}`;
+    
+    const formattedText = text
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\n/g, '<br>');
+
+    msgDiv.innerHTML = formattedText;
+    ui.chatWindow.appendChild(msgDiv);
+    
+    // Плавная прокрутка к последнему сообщению
+    ui.chatWindow.scrollTo({
+        top: ui.chatWindow.scrollHeight,
+        behavior: 'smooth'
+    });
+}
