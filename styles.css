@@ -15,57 +15,118 @@
     --status-info: #0284c7;
     --status-brand: #2563eb;
 
-    --font-ui: 'Inter', sans-serif;
-    --font-data: 'JetBrains Mono', monospace;
+    --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-data: 'JetBrains Mono', Consolas, monospace;
     
     --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { 
+    box-sizing: border-box; 
+    margin: 0; 
+    padding: 0; 
+}
+
+html, body {
+    height: 100%;
+}
 
 body {
     background-color: var(--bg-canvas);
     color: var(--text-main);
     font-family: var(--font-ui);
-    height: 100vh;
+    min-height: 100vh;
+    min-height: 100dvh;
     display: flex;
     flex-direction: column;
-    font-size: 14px;
+    font-size: clamp(13px, 0.9vw, 14px);
+    overflow-x: hidden;
 }
 
-/* Header */
+/* ==========================================================================
+   1. ШАПКА (HEADER) — Адаптивная
+   ========================================================================== */
 header {
     background-color: var(--bg-panel);
     border-bottom: 1px solid var(--border-subtle);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 24px;
-    height: 60px;
+    padding: 0 clamp(12px, 2vw, 24px);
+    min-height: 60px;
     box-shadow: var(--shadow-sm);
-    z-index: 10;
+    z-index: 20;
+    flex-wrap: wrap;
+    gap: 12px;
 }
 
-.header-left { display: flex; align-items: center; gap: 24px; }
-.logo { font-weight: 700; font-size: 15px; color: var(--text-main); display: flex; align-items: center; gap: 10px; }
-.logo-badge { background: var(--status-brand); color: #fff; padding: 4px 8px; border-radius: 6px; font-family: var(--font-data); font-size: 12px; }
-.node-id { font-size: 11px; font-family: var(--font-data); color: var(--text-muted); background: #f8fafc; padding: 3px 6px; border-radius: 4px; border: 1px solid var(--border-subtle); }
+.header-left { 
+    display: flex; 
+    align-items: center; 
+    gap: clamp(10px, 1.5vw, 20px);
+    flex-wrap: wrap;
+}
 
-nav { display: flex; gap: 16px; height: 100%; }
+.logo { 
+    font-weight: 700; 
+    font-size: clamp(14px, 1.1vw, 16px); 
+    color: var(--text-main); 
+    display: flex; 
+    align-items: center; 
+    gap: 8px; 
+    white-space: nowrap;
+}
+
+.logo-badge { 
+    background: var(--status-brand); 
+    color: #fff; 
+    padding: 4px 8px; 
+    border-radius: 6px; 
+    font-family: var(--font-data); 
+    font-size: 11px; 
+}
+
+.node-id { 
+    font-size: 11px; 
+    font-family: var(--font-data); 
+    color: var(--text-muted); 
+    background: #f8fafc; 
+    padding: 3px 6px; 
+    border-radius: 4px; 
+    border: 1px solid var(--border-subtle); 
+    white-space: nowrap;
+}
+
+nav { 
+    display: flex; 
+    gap: 12px; 
+    height: 100%; 
+}
+
 nav a {
     text-decoration: none;
     color: var(--text-muted);
     font-weight: 500;
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    padding: 0 8px;
+    padding: 8px 4px;
     border-bottom: 2px solid transparent;
-    transition: all 0.2s;
+    transition: color 0.15s, border-color 0.15s;
+    white-space: nowrap;
+    font-size: 13px;
 }
 nav a:hover { color: var(--status-brand); }
 nav a.active { color: var(--status-brand); border-bottom-color: var(--status-brand); font-weight: 600; }
 
-.header-right { display: flex; align-items: center; gap: 16px; }
+.header-right { 
+    display: flex; 
+    align-items: center; 
+    gap: 12px; 
+    margin-left: auto;
+    flex-wrap: wrap;
+}
+
 .badge-status {
     display: inline-flex;
     align-items: center;
@@ -78,67 +139,242 @@ nav a.active { color: var(--status-brand); border-bottom-color: var(--status-bra
     background: #ecfdf5;
     color: var(--status-ok);
     border: 1px solid #a7f3d0;
+    white-space: nowrap;
 }
-.clock { font-family: var(--font-data); font-weight: 600; color: var(--text-main); font-size: 13px; }
 
-/* Dashboard Grid */
+.clock { 
+    font-family: var(--font-data); 
+    font-weight: 600; 
+    color: var(--text-main); 
+    font-size: 13px; 
+    white-space: nowrap;
+}
+
+/* ==========================================================================
+   2. ГЛАВНЫЙ ЛЕЙАУТ (DASHBOARD LAYOUT)
+   ========================================================================== */
 .dashboard-layout {
     display: grid;
-    grid-template-columns: 1fr 420px;
+    grid-template-columns: minmax(0, 1fr) clamp(340px, 28vw, 460px);
     flex: 1;
+    min-height: 0; /* Критично для правильного скролла внутри грида */
     overflow: hidden;
 }
 
-main { padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+main { 
+    padding: clamp(12px, 1.8vw, 24px); 
+    overflow-y: auto; 
+    display: flex; 
+    flex-direction: column; 
+    gap: clamp(14px, 1.8vw, 24px); 
+    min-width: 0; /* Не дает переполнять grid-колонку */
+}
 
-/* KPI Metrics */
-.kpi-panel { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+/* ==========================================================================
+   3. ПАНЕЛЬ KPI (МЕТРИКИ) — auto-fit сетка
+   ========================================================================== */
+.kpi-panel { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr)); 
+    gap: clamp(10px, 1.2vw, 16px); 
+}
+
 .kpi-card {
     background: var(--bg-panel);
     border: 1px solid var(--border-subtle);
     border-radius: 8px;
-    padding: 14px 16px;
+    padding: clamp(12px, 1.2vw, 16px);
     box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
-.kpi-card.warn { border-color: #fde68a; background: #fffbeb; }
-.kpi-label { font-size: 11px; text-transform: uppercase; font-weight: 600; color: var(--text-muted); letter-spacing: 0.5px; }
-.kpi-value { font-size: 22px; font-family: var(--font-data); font-weight: 700; margin-top: 6px; }
-.kpi-value span { font-size: 12px; font-family: var(--font-ui); font-weight: 400; color: var(--text-muted); }
 
-/* Video Grid */
-.video-matrix { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.kpi-card.warn { 
+    border-color: #fde68a; 
+    background: #fffbeb; 
+}
+
+.kpi-label { 
+    font-size: 11px; 
+    text-transform: uppercase; 
+    font-weight: 600; 
+    color: var(--text-muted); 
+    letter-spacing: 0.5px; 
+}
+
+.kpi-value { 
+    font-size: clamp(20px, 1.8vw, 26px); 
+    font-family: var(--font-data); 
+    font-weight: 700; 
+    margin-top: 6px; 
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.kpi-value span { 
+    font-size: 12px; 
+    font-family: var(--font-ui); 
+    font-weight: 400; 
+    color: var(--text-muted); 
+}
+
+/* ==========================================================================
+   4. СЕТКА КАМЕР (16:9 АВТО-ПРОПОРЦИИ)
+   ========================================================================== */
+.video-matrix { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); 
+    gap: clamp(10px, 1.2vw, 16px); 
+}
+
 .camera-feed {
-    background: #0f172a;
+    background: #0b1120;
     border-radius: 8px;
-    height: 220px;
+    aspect-ratio: 16 / 9;
+    min-height: 200px;
     position: relative;
     overflow: hidden;
     box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-subtle);
 }
+
 .cam-header {
-    position: absolute; top: 10px; left: 10px; right: 10px;
-    display: flex; justify-content: space-between; z-index: 2;
+    position: absolute; 
+    top: 10px; 
+    left: 10px; 
+    right: 10px;
+    display: flex; 
+    justify-content: space-between; 
+    z-index: 2;
+    pointer-events: none;
 }
-.cam-tag { background: rgba(255,255,255,0.92); color: #0f172a; padding: 3px 8px; font-family: var(--font-data); font-size: 10px; border-radius: 4px; font-weight: 700; }
-.bbox { position: absolute; border: 2px solid var(--status-info); }
-.bbox-label { background: var(--status-info); color: #fff; font-family: var(--font-data); font-size: 10px; padding: 2px 4px; font-weight: 700; position: absolute; top: -18px; left: -2px; white-space: nowrap; }
-.bbox.alarm { border-color: var(--status-warn); }
-.bbox.alarm .bbox-label { background: var(--status-warn); color: #000; }
 
-/* AI Console Sidebar */
-aside { background: var(--bg-panel); border-left: 1px solid var(--border-subtle); display: flex; flex-direction: column; z-index: 5; }
-.ai-header { padding: 14px 16px; border-bottom: 1px solid var(--border-subtle); background: #f8fafc; }
-.ai-header h2 { font-size: 14px; font-weight: 600; color: var(--text-main); }
-.ai-header p { font-size: 11px; font-family: var(--font-data); color: var(--status-brand); margin-top: 2px; }
+.cam-tag { 
+    background: rgba(255, 255, 255, 0.94); 
+    color: #0f172a; 
+    padding: 3px 8px; 
+    font-family: var(--font-data); 
+    font-size: 10px; 
+    border-radius: 4px; 
+    font-weight: 700; 
+    box-shadow: var(--shadow-sm);
+}
 
-.chat-messages { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
-.msg { max-width: 90%; padding: 10px 12px; border-radius: 6px; font-size: 13px; line-height: 1.5; }
-.msg-sys { background: #f8fafc; border: 1px solid var(--border-subtle); border-left: 3px solid var(--status-brand); align-self: flex-start; }
-.msg-op { background: var(--status-brand); color: #fff; align-self: flex-end; border-bottom-right-radius: 0; }
+/* Bounding Boxes */
+.bbox { 
+    position: absolute; 
+    border: 2px solid var(--status-info); 
+    background: rgba(2, 132, 199, 0.08);
+}
 
-.chat-controls { padding: 14px 16px; border-top: 1px solid var(--border-subtle); background: #ffffff; }
-.chips-row { display: flex; gap: 6px; margin-bottom: 10px; overflow-x: auto; padding-bottom: 4px; }
-.chips-row::-webkit-scrollbar { height: 3px; }
+.bbox-label { 
+    background: var(--status-info); 
+    color: #fff; 
+    font-family: var(--font-data); 
+    font-size: 9px; 
+    padding: 2px 4px; 
+    font-weight: 700; 
+    position: absolute; 
+    top: -18px; 
+    left: -2px; 
+    white-space: nowrap; 
+}
+
+.bbox.alarm { 
+    border-color: var(--status-warn); 
+    background: rgba(217, 119, 6, 0.12);
+}
+.bbox.alarm .bbox-label { 
+    background: var(--status-warn); 
+    color: #000; 
+}
+
+/* ==========================================================================
+   5. САЙДБАР ИИ-ДИСПЕТЧЕРА (ЧАТ)
+   ========================================================================== */
+aside { 
+    background: var(--bg-panel); 
+    border-left: 1px solid var(--border-subtle); 
+    display: flex; 
+    flex-direction: column; 
+    z-index: 10;
+    min-height: 0; /* Обязательно для внутренней прокрутки */
+    min-width: 0;
+}
+
+.ai-header { 
+    padding: 14px 16px; 
+    border-bottom: 1px solid var(--border-subtle); 
+    background: #f8fafc; 
+}
+
+.ai-header h2 { 
+    font-size: 14px; 
+    font-weight: 600; 
+    color: var(--text-main); 
+}
+
+.ai-header p { 
+    font-size: 11px; 
+    font-family: var(--font-data); 
+    color: var(--status-brand); 
+    margin-top: 2px; 
+}
+
+.chat-messages { 
+    flex: 1; 
+    padding: 16px; 
+    overflow-y: auto; 
+    display: flex; 
+    flex-direction: column; 
+    gap: 12px; 
+    min-height: 0;
+}
+
+.msg { 
+    max-width: 90%; 
+    padding: 10px 14px; 
+    border-radius: 8px; 
+    font-size: 13px; 
+    line-height: 1.5; 
+    word-break: break-word;
+}
+
+.msg-sys { 
+    background: #f8fafc; 
+    border: 1px solid var(--border-subtle); 
+    border-left: 3px solid var(--status-brand); 
+    align-self: flex-start; 
+}
+
+.msg-op { 
+    background: var(--status-brand); 
+    color: #fff; 
+    align-self: flex-end; 
+    border-bottom-right-radius: 2px; 
+}
+
+.chat-controls { 
+    padding: 12px 16px; 
+    border-top: 1px solid var(--border-subtle); 
+    background: #ffffff; 
+}
+
+.chips-row { 
+    display: flex; 
+    gap: 6px; 
+    margin-bottom: 10px; 
+    overflow-x: auto; 
+    padding-bottom: 4px; 
+    -webkit-overflow-scrolling: touch;
+}
+
+.chips-row::-webkit-scrollbar { height: 4px; }
+.chips-row::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+
 .chip-btn {
     background: #f1f5f9;
     border: 1px solid var(--border-subtle);
@@ -149,21 +385,29 @@ aside { background: var(--bg-panel); border-left: 1px solid var(--border-subtle)
     font-family: var(--font-ui);
     cursor: pointer;
     white-space: nowrap;
-    transition: all 0.2s;
+    transition: background-color 0.15s, border-color 0.15s;
+    flex-shrink: 0;
 }
 .chip-btn:hover { background: #e2e8f0; border-color: #cbd5e1; }
 
-.chat-input-group { display: flex; gap: 8px; }
+.chat-input-group { 
+    display: flex; 
+    gap: 8px; 
+}
+
 input[type="text"] {
     flex: 1;
+    min-width: 0;
     border: 1px solid var(--border-subtle);
-    padding: 8px 12px;
+    padding: 9px 12px;
     border-radius: 6px;
     outline: none;
     font-family: var(--font-ui);
     font-size: 13px;
+    transition: border-color 0.15s;
 }
 input[type="text"]:focus { border-color: var(--status-brand); }
+
 button.btn-send {
     background: var(--status-brand);
     color: #fff;
@@ -173,12 +417,106 @@ button.btn-send {
     cursor: pointer;
     font-weight: 600;
     font-size: 12px;
+    white-space: nowrap;
+    transition: background-color 0.15s;
+}
+button.btn-send:hover { background: #1d4ed8; }
+
+/* ==========================================================================
+   6. ТАБЛИЦЫ (СТРАНИЦА LOGS) С АВТО-СКРОЛЛОМ
+   ========================================================================== */
+.table-container { 
+    background: var(--bg-panel); 
+    border: 1px solid var(--border-subtle); 
+    border-radius: 8px; 
+    overflow-x: auto; 
+    box-shadow: var(--shadow-sm); 
+    -webkit-overflow-scrolling: touch;
 }
 
-/* Tables */
-.table-container { background: var(--bg-panel); border: 1px solid var(--border-subtle); border-radius: 8px; overflow: hidden; box-shadow: var(--shadow-sm); }
-table { width: 100%; border-collapse: collapse; text-align: left; }
-th, td { padding: 10px 14px; border-bottom: 1px solid var(--border-subtle); }
-th { font-size: 11px; text-transform: uppercase; color: var(--text-muted); background: #f8fafc; font-weight: 600; }
-td { font-family: var(--font-data); font-size: 12px; }
+table { 
+    width: 100%; 
+    min-width: 640px; /* Чтобы не сжимало колонки до нечитаемости */
+    border-collapse: collapse; 
+    text-align: left; 
+}
+
+th, td { 
+    padding: 10px 14px; 
+    border-bottom: 1px solid var(--border-subtle); 
+}
+
+th { 
+    font-size: 11px; 
+    text-transform: uppercase; 
+    color: var(--text-muted); 
+    background: #f8fafc; 
+    font-weight: 600; 
+    letter-spacing: 0.5px;
+}
+
+td { 
+    font-family: var(--font-data); 
+    font-size: 12px; 
+}
+
 .row-warn { background: #fffbeb; }
+
+/* ==========================================================================
+   7. МЕДИА-ЗАПРОСЫ (MEDIA QUERIES) ДЛЯ МОБИЛЬНЫХ И ПЛАНШЕТОВ
+   ========================================================================== */
+
+/* Планшеты и компактные экраны (< 1080px): переключение в одну колонку */
+@media (max-width: 1080px) {
+    body {
+        overflow-y: auto;
+    }
+
+    .dashboard-layout {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto;
+        overflow: visible;
+    }
+
+    main {
+        overflow-y: visible;
+    }
+
+    aside {
+        border-left: none;
+        border-top: 1px solid var(--border-subtle);
+        height: 520px;
+    }
+}
+
+/* Смартфоны (< 640px) */
+@media (max-width: 640px) {
+    header {
+        padding: 10px 14px;
+        min-height: auto;
+    }
+
+    .header-left, .header-right {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    nav {
+        order: 3;
+        width: 100%;
+        border-top: 1px solid var(--border-subtle);
+        padding-top: 8px;
+    }
+
+    .node-id {
+        display: none; /* Прячем технический узел на узких экранах ради компактности */
+    }
+
+    .video-matrix {
+        grid-template-columns: 1fr; /* По одной камере во всю ширину */
+    }
+
+    aside {
+        height: 440px;
+    }
+}
