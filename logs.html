@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroCell WMS | Журнал транзакций</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="header-left">
+            <div class="logo">
+                <span class="logo-badge">NC</span>
+                <span>NEUROCELL WMS</span>
+            </div>
+            <span class="node-id">NODE-NSK-NC01 [НОВОСИБИРСК]</span>
+            <nav>
+                <a href="index.html">Видеомониторинг</a>
+                <a href="logs.html" class="active">Журнал транзакций WMS</a>
+            </nav>
+        </div>
+        <div class="header-right">
+            <div class="clock" id="system-clock">--:--:--</div>
+        </div>
+    </header>
+
+    <div style="padding: 24px; max-width: 1200px; margin: 0 auto; width: 100%;">
+        <h2 style="margin-bottom: 16px; font-size: 18px; font-weight: 600;">Реестр бесконтактного учета ТМЦ (Синхронизация с 1С)</h2>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>TIMESTAMP</th>
+                        <th>ИСТОЧНИК</th>
+                        <th>СОБЫТИЕ</th>
+                        <th>ШТРИХ-КОД</th>
+                        <th>СТАТУС 1С:WMS</th>
+                    </tr>
+                </thead>
+                <tbody id="logs-tbody">
+                    <tr>
+                        <td>2026-09-24 11:29:45</td>
+                        <td>CAM-01 (Приемка)</td>
+                        <td>Детекция паллеты</td>
+                        <td>4607001239845</td>
+                        <td style="color: var(--status-ok); font-weight: 600;">200 OK (Синхронизировано)</td>
+                    </tr>
+                    <tr class="row-warn">
+                        <td>2026-09-24 11:30:12</td>
+                        <td>CAM-03 (Стеллаж В)</td>
+                        <td>Нарушение адресации (Ячейка В-04)</td>
+                        <td>PL-ERR-992</td>
+                        <td style="color: var(--status-warn); font-weight: 600;">ТРЕВОГА: ТРЕБУЕТСЯ ПЕРЕМЕЩЕНИЕ</td>
+                    </tr>
+                    <tr>
+                        <td>2026-09-24 11:31:05</td>
+                        <td>CAM-02 (Коридор)</td>
+                        <td>Фиксация персонала (ID:14)</td>
+                        <td>-</td>
+                        <td style="color: var(--text-muted)">МОНИТОРИНГ ШТАТНО</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

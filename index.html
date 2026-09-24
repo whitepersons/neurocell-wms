@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroCell WMS | Оперативный видеомониторинг</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="header-left">
+            <div class="logo">
+                <span class="logo-badge">NC</span>
+                <span>NEUROCELL WMS</span>
+            </div>
+            <span class="node-id">NODE-NSK-NC01 [НОВОСИБИРСК]</span>
+            <nav>
+                <a href="index.html" class="active">Видеомониторинг</a>
+                <a href="logs.html">Журнал транзакций WMS</a>
+            </nav>
+        </div>
+        <div class="header-right">
+            <div class="badge-status">
+                1С:WMS BRIDGE: ONLINE (120 ms)
+            </div>
+            <div class="clock" id="system-clock">--:--:--</div>
+        </div>
+    </header>
+
+    <div class="dashboard-layout">
+        <main>
+            <section class="kpi-panel">
+                <div class="kpi-card">
+                    <span class="kpi-label">Активные каналы CV</span>
+                    <div class="kpi-value">04 / 04 <span>ACTIVE</span></div>
+                </div>
+                <div class="kpi-card">
+                    <span class="kpi-label">Распознано паллет</span>
+                    <div class="kpi-value" id="pallet-counter">142</div>
+                </div>
+                <div class="kpi-card">
+                    <span class="kpi-label">Задержка инференса</span>
+                    <div class="kpi-value">180 <span>ms (C++/TensorRT)</span></div>
+                </div>
+                <div class="kpi-card warn">
+                    <span class="kpi-label" style="color: var(--status-warn)">Инциденты адресации</span>
+                    <div class="kpi-value" style="color: var(--status-warn)">1 <span>ЯЧЕЙКА В-04</span></div>
+                </div>
+            </section>
+
+            <section class="video-matrix">
+                <!-- CAM 01 -->
+                <div class="camera-feed">
+                    <div class="cam-header">
+                        <div class="cam-tag">CAM-01: ЗОНА ПРИЕМКИ А-1</div>
+                    </div>
+                    <div class="bbox" style="top: 25%; left: 30%; width: 42%; height: 55%;">
+                        <div class="bbox-label">[PALLET #PL-8492 // 99.2%]</div>
+                    </div>
+                </div>
+
+                <!-- CAM 02 -->
+                <div class="camera-feed">
+                    <div class="cam-header">
+                        <div class="cam-tag">CAM-02: ТРАНСПОРТНЫЙ КОРИДОР</div>
+                    </div>
+                    <div class="bbox" style="top: 15%; left: 55%; width: 28%; height: 68%;">
+                        <div class="bbox-label">[PERSONNEL ID:14 // OK]</div>
+                    </div>
+                </div>
+
+                <!-- CAM 03 (ALARM) -->
+                <div class="camera-feed" style="border: 2px solid var(--status-warn);">
+                    <div class="cam-header">
+                        <div class="cam-tag" style="background: var(--status-warn); color: #000;">CAM-03: СТЕЛЛАЖ В-04 (ТРЕВОГА)</div>
+                    </div>
+                    <div class="bbox alarm" style="top: 35%; left: 22%; width: 50%; height: 45%;">
+                        <div class="bbox-label">[НЕСООТВЕТСТВИЕ: ОЖИДАЛОСЬ В-06]</div>
+                    </div>
+                </div>
+
+                <!-- CAM 04 -->
+                <div class="camera-feed">
+                    <div class="cam-header">
+                        <div class="cam-tag">CAM-04: ЭКСПЕДИЦИЯ И ОТГРУЗКА</div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <aside>
+            <div class="ai-header">
+                <h2>ИИ-Диспетчер NeuroCell</h2>
+                <p>GigaChat Enterprise // WMS Context Connected</p>
+            </div>
+            
+            <div class="chat-messages" id="chat-window">
+                <div class="msg msg-sys">
+                    Система <strong>NeuroCell WMS</strong> активна. Обнаружена аномалия на CAM-03 (ошибка ячейки В-04). Готов выдать регламент или проверить статус 1C.
+                </div>
+            </div>
+
+            <div class="chat-controls">
+                <div class="chips-row">
+                    <button type="button" class="chip-btn" onclick="sendQuickMessage('Дай регламент расследования ошибки ячейки В-04')">Регламент В-04</button>
+                    <button type="button" class="chip-btn" onclick="sendQuickMessage('Проверь текущий статус шлюза 1C:WMS')">Статус 1C:WMS</button>
+                    <button type="button" class="chip-btn" onclick="sendQuickMessage('Что делать при пересортице паллет?')">Пересортица</button>
+                </div>
+                <div class="chat-input-group">
+                    <input type="text" id="chat-input" placeholder="Запрос к диспетчеру..." onkeypress="handleEnter(event)">
+                    <button type="button" class="btn-send" onclick="sendMessage()">Отправить</button>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
