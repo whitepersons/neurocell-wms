@@ -1,6 +1,5 @@
 // app.js
 
-// Запросы идут на локальный serverless-эндпоинт Vercel
 const API_URL = '/api/chat';
 
 function initSystem() {
@@ -91,24 +90,53 @@ window.handleEnter = function(event) {
     if (event.key === 'Enter') sendMessage();
 };
 
+window.acknowledgeAlert = function() {
+    const cam3 = document.getElementById('cam-03');
+    const bboxLabel = document.getElementById('cam-03-bbox-label');
+    const incidentCounter = document.getElementById('incident-counter');
+    const incidentLabel = document.getElementById('incident-label');
+    const ackBtn = document.getElementById('btn-ack');
+
+    if (cam3) {
+        cam3.style.borderColor = 'var(--border-subtle)';
+        const headerTag = cam3.querySelector('.cam-tag');
+        if(headerTag) {
+             headerTag.style.background = 'rgba(255, 255, 255, 0.94)';
+             headerTag.style.color = '#0f172a';
+             headerTag.textContent = 'CAM-03: СТЕЛЛАЖ В-06';
+        }
+        
+        const bbox = cam3.querySelector('.bbox');
+        if(bbox) {
+            bbox.classList.remove('alarm');
+        }
+    }
+
+    if (bboxLabel) {
+        bboxLabel.textContent = '[PALLET #PL-8492 // VERIFIED B-06]';
+    }
+
+    if (incidentCounter) {
+        incidentCounter.innerHTML = '0 <span style="color: var(--text-muted);">INCIDENTS</span>';
+        incidentCounter.style.color = 'var(--text-main)';
+    }
+
+    if (incidentLabel) {
+        incidentLabel.style.color = 'var(--text-muted)';
+        const card = incidentLabel.closest('.kpi-card');
+        if (card) {
+             card.classList.remove('warn');
+             card.style.borderColor = 'var(--border-subtle)';
+             card.style.background = 'var(--bg-panel)';
+        }
+    }
+    
+    if(ackBtn) {
+        ackBtn.style.display = 'none';
+    }
+
+    appendMessage(`**[СИСТЕМА]:** Тревога на CAM-03 квитирована. Паллета #PL-8492 зафиксирована в ячейке В-06. Статус в 1С:WMS обновлен (200 OK). Буфер транзакций (PostgreSQL) синхронизирован.`, false);
+};
+
+
 document.addEventListener('DOMContentLoaded', initSystem);
-
-function renderMessage(text, isUser = false) {
-    if (!ui.chatWindow) return;
-    
-    const msgDiv = document.createElement('div');
-    msgDiv.className = `msg ${isUser ? 'msg-op' : 'msg-sys'}`;
-    
-    const formattedText = text
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\n/g, '<br>');
-
-    msgDiv.innerHTML = formattedText;
-    ui.chatWindow.appendChild(msgDiv);
-    
-    // Плавная прокрутка к последнему сообщению
-    ui.chatWindow.scrollTo({
-        top: ui.chatWindow.scrollHeight,
-        behavior: 'smooth'
-    });
-}

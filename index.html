@@ -43,9 +43,13 @@
                     <span class="kpi-label">Задержка инференса</span>
                     <div class="kpi-value">180 <span>ms (C++/TensorRT)</span></div>
                 </div>
-                <div class="kpi-card warn">
-                    <span class="kpi-label" style="color: var(--status-warn)">Инциденты адресации</span>
-                    <div class="kpi-value" style="color: var(--status-warn)">1 <span>ЯЧЕЙКА В-04</span></div>
+                 <div class="kpi-card">
+                    <span class="kpi-label">Буфер PostgreSQL</span>
+                    <div class="kpi-value">0 TX <span>SYNCED</span></div>
+                </div>
+                <div class="kpi-card warn" id="incident-card">
+                    <span class="kpi-label" id="incident-label" style="color: var(--status-warn)">Инциденты адресации</span>
+                    <div class="kpi-value" id="incident-counter" style="color: var(--status-warn)">1 <span>ЯЧЕЙКА В-04</span></div>
                 </div>
             </section>
 
@@ -54,6 +58,7 @@
                 <div class="camera-feed">
                     <div class="cam-header">
                         <div class="cam-tag">CAM-01: ЗОНА ПРИЕМКИ А-1</div>
+                        <div class="cam-lux">115 LX // OK</div>
                     </div>
                     <div class="bbox" style="top: 25%; left: 30%; width: 42%; height: 55%;">
                         <div class="bbox-label">[PALLET #PL-8492 // 99.2%]</div>
@@ -64,6 +69,7 @@
                 <div class="camera-feed">
                     <div class="cam-header">
                         <div class="cam-tag">CAM-02: ТРАНСПОРТНЫЙ КОРИДОР</div>
+                        <div class="cam-lux">90 LX // OK</div>
                     </div>
                     <div class="bbox" style="top: 15%; left: 55%; width: 28%; height: 68%;">
                         <div class="bbox-label">[PERSONNEL ID:14 // OK]</div>
@@ -71,12 +77,14 @@
                 </div>
 
                 <!-- CAM 03 (ALARM) -->
-                <div class="camera-feed" style="border: 2px solid var(--status-warn);">
+                <div class="camera-feed" id="cam-03" style="border: 2px solid var(--status-warn);">
                     <div class="cam-header">
                         <div class="cam-tag" style="background: var(--status-warn); color: #000;">CAM-03: СТЕЛЛАЖ В-04 (ТРЕВОГА)</div>
+                        <div class="cam-lux low">48 LX // LOW LIGHT</div>
                     </div>
+                     <button type="button" id="btn-ack" class="btn-ack" onclick="acknowledgeAlert()">Квитировать (В-06)</button>
                     <div class="bbox alarm" style="top: 35%; left: 22%; width: 50%; height: 45%;">
-                        <div class="bbox-label">[НЕСООТВЕТСТВИЕ: ОЖИДАЛОСЬ В-06]</div>
+                        <div class="bbox-label" id="cam-03-bbox-label">[НЕСООТВЕТСТВИЕ: ОЖИДАЛОСЬ В-06]</div>
                     </div>
                 </div>
 
@@ -84,6 +92,7 @@
                 <div class="camera-feed">
                     <div class="cam-header">
                         <div class="cam-tag">CAM-04: ЭКСПЕДИЦИЯ И ОТГРУЗКА</div>
+                         <div class="cam-lux">122 LX // OK</div>
                     </div>
                 </div>
             </section>
